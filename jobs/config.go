@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tritondatacenter/containerpilot/commands"
-	"github.com/tritondatacenter/containerpilot/config/decode"
-	"github.com/tritondatacenter/containerpilot/config/services"
-	"github.com/tritondatacenter/containerpilot/config/timing"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/commands"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/services"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/timing"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
 	log "github.com/sirupsen/logrus"
 )
 

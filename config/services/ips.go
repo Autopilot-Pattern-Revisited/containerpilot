@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 	"regexp"
@@ -9,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -157,18 +158,18 @@ func (spec cidrInterfaceSpec) Match(index int, iip interfaceIP) bool {
 }
 
 func parseInterfaceSpecs(interfaces []string) ([]interfaceSpec, error) {
-	var errors []string
+	var errs []string
 	var specs []interfaceSpec
 	for _, iface := range interfaces {
 		spec, err := parseInterfaceSpec(iface)
 		if err != nil {
-			errors = append(errors, err.Error())
+			errs = append(errs, err.Error())
 			continue
 		}
 		specs = append(specs, spec)
 	}
-	if len(errors) > 0 {
-		err := fmt.Errorf(strings.Join(errors, "\n"))
+	if len(errs) > 0 {
+		err := errors.New(strings.Join(errs, "\n"))
 		log.Errorln(err)
 		return specs, err
 	}
@@ -254,13 +255,13 @@ func (iip interfaceIP) String() string {
 // of IPs for each interface.
 func getinterfaceIPs(interfaces []net.Interface) ([]interfaceIP, error) {
 	var ifaceIPs []interfaceIP
-	var errors []string
+	var errs []string
 
 	for _, intf := range interfaces {
 		ipAddrs, addrErr := intf.Addrs()
 
 		if addrErr != nil {
-			errors = append(errors, addrErr.Error())
+			errs = append(errs, addrErr.Error())
 			continue
 		}
 
@@ -270,7 +271,7 @@ func getinterfaceIPs(interfaces []net.Interface) ([]interfaceIP, error) {
 			for _, splitIP := range strings.Split(ipAddr.String(), " ") {
 				ip, _, err := net.ParseCIDR(splitIP)
 				if err != nil {
-					errors = append(errors, err.Error())
+					errs = append(errs, err.Error())
 					continue
 				}
 				intfIP := interfaceIP{Name: intf.Name, IP: ip}
@@ -285,8 +286,8 @@ func getinterfaceIPs(interfaces []net.Interface) ([]interfaceIP, error) {
 
 	/* If we had any errors parsing interfaces, we accumulate them all and
 	 * then return them so that the caller can decide what they want to do. */
-	if len(errors) > 0 {
-		err := fmt.Errorf(strings.Join(errors, "\n"))
+	if len(errs) > 0 {
+		err := errors.New(strings.Join(errs, "\n"))
 		log.Errorln(err)
 		return ifaceIPs, err
 	}

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
-	"github.com/tritondatacenter/containerpilot/tests/mocks"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/tests/mocks"
 )
 
 func TestWatchPollOk(t *testing.T) {

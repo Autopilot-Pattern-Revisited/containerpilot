@@ -3,9 +3,9 @@ package watches
 import (
 	"fmt"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
-	"github.com/tritondatacenter/containerpilot/config/services"
-	"github.com/tritondatacenter/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/services"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
 )
 
 // Config configures the watch

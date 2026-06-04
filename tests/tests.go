@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"github.com/flynn/json5"
+	"github.com/titanous/json5"
 )
 
 // DecodeRawToSlice supports testing NewConfig functions, which never receive the

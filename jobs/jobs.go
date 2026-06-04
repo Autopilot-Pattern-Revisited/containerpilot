@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tritondatacenter/containerpilot/commands"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/commands"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
 	log "github.com/sirupsen/logrus"
 )
 

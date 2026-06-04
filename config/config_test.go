@@ -136,12 +136,41 @@ func TestValidConfigControl(t *testing.T) {
 		"config for control.socket")
 }
 
+func TestValidConfigYAML(t *testing.T) {
+	cfg, err := LoadConfig("./testdata/test.yaml")
+	if err != nil {
+		t.Fatalf("unexpected error in LoadConfig: %v", err)
+	}
+
+	if len(cfg.Jobs) != 10 {
+		t.Fatalf("expected 10 jobs but got %v", cfg.Jobs)
+	}
+	assert.Equal(t, "serviceA", cfg.Jobs[0].Name, "config for Jobs[0].Name")
+	assert.Equal(t, 8080, cfg.Jobs[0].Port, "config for Jobs[0].Port")
+	assert.Equal(t, []string{"tag1", "tag2"}, cfg.Jobs[0].Tags, "config for Jobs[0].Tags")
+	assert.Equal(t, map[string]string{"keyA": "A"}, cfg.Jobs[0].Meta, "config for Jobs[0].Meta")
+	assert.Equal(t, "periodicTaskD", cfg.Jobs[3].Name, "config for Jobs[3].Name")
+	assert.Equal(t, "1s", cfg.Jobs[3].When.Frequency, "config for Jobs[3].When.Frequency")
+
+	if len(cfg.Watches) != 2 {
+		t.Fatalf("expected 2 watches but got %v", cfg.Watches)
+	}
+	assert.Equal(t, "watch.upstreamA", cfg.Watches[0].Name, "config for Watches[0].Name")
+	assert.Equal(t, 11, cfg.Watches[0].Poll, "config for Watches[0].Poll")
+	assert.Equal(t, "dev", cfg.Watches[0].Tag, "config for Watches[0].Tag")
+
+	assert.Equal(t, 9000, cfg.Telemetry.Port, "config for Telemetry.Port")
+	assert.Equal(t, []string{"dev"}, cfg.Telemetry.Tags, "config for Telemetry.Tags")
+	assert.Equal(t, "zed", cfg.Telemetry.MetricConfigs[0].Name, "config for Telemetry.MetricConfigs[0].Name")
+	assert.Equal(t, "/var/run/containerpilot.socket", cfg.Control.SocketPath, "config for Control.SocketPath")
+}
+
 func TestCustomConfigControl(t *testing.T) {
 	var testJSONWithSocket = `{
 	"control": {"socket": "/var/run/cp3-test.sock"},
 	"consul": "consul:8500"}`
 
-	cfg, err := newConfig([]byte(testJSONWithSocket))
+	cfg, err := newConfig([]byte(testJSONWithSocket), ConfigFormatJSON5)
 	if err != nil {
 		t.Fatalf("unexpected error in LoadConfig: %v", err)
 	}
@@ -199,7 +228,7 @@ func TestRenderedConfigIsParseable(t *testing.T) {
 
 	os.Setenv("TESTRENDERCONFIGISPARSEABLE", "-ok")
 	template, _ := renderConfigTemplate([]byte(testJSON))
-	config, err := newConfig(template)
+	config, err := newConfig(template, ConfigFormatJSON5)
 	if err != nil {
 		t.Fatalf("unexpected error in LoadConfig: %v", err)
 	}

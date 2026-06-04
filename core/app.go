@@ -10,13 +10,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tritondatacenter/containerpilot/config"
-	"github.com/tritondatacenter/containerpilot/control"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/telemetry"
-	"github.com/tritondatacenter/containerpilot/watches"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/control"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/telemetry"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/watches"
 
 	log "github.com/sirupsen/logrus"
 )

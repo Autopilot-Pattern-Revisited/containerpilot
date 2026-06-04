@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/tests/mocks"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/tests/mocks"
 )
 
 /*
@@ -151,7 +151,7 @@ func TestReloadConfig(t *testing.T) {
 // write the configuration to a tempfile. caller is responsible
 // for calling 'defer os.Remove(f.Name())' when done
 func testCfgToTempFile(t *testing.T, text string) *os.File {
-	f, err := os.CreateTemp(".", "test-")
+	f, err := os.CreateTemp(".", "test-*.json5")
 	if err != nil {
 		t.Fatal(err)
 	}

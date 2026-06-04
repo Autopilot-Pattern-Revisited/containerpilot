@@ -5,14 +5,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tritondatacenter/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
 
 const eventBufferSize = 1000
 
-// go:generate stringer -type MetricType
+//go:generate stringer -type MetricType
 
 // MetricType is an enum for Prometheus metric types
 type MetricType int

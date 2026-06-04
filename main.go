@@ -1,19 +1,26 @@
 // ContainerPilot is an init system for cloud-native distributed applications
 // that automates the process of service discovery, configuration, and
 // lifecycle management inside the container, so you can focus on your apps.
-package main // import "github.com/tritondatacenter/containerpilot"
+package main // import "github.com/Autopilot-Pattern-Revisited/containerpilot"
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
+	"strings"
 
-	"github.com/tritondatacenter/containerpilot/core"
-	"github.com/tritondatacenter/containerpilot/sup"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/core"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/internal/consultemplate"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/sup"
 	log "github.com/sirupsen/logrus"
 )
 
 // Main executes the containerpilot CLI
 func main() {
+	if executableName() == "consul-template" {
+		os.Exit(consultemplate.Run(os.Args))
+	}
+
 	// make sure we use only a single CPU so as not to cause
 	// contention on the main application
 	runtime.GOMAXPROCS(1)
@@ -41,4 +48,9 @@ func main() {
 		log.Fatal(configErr)
 	}
 	app.Run() // blocks forever
+}
+
+func executableName() string {
+	name := filepath.Base(os.Args[0])
+	return strings.TrimSuffix(name, ".exe")
 }

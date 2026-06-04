@@ -311,9 +311,9 @@ func TestInterfaceIPSorting(t *testing.T) {
 	copy(unsortedIIPs, sortedIIPs)
 
 	// Shuffle unsortedIIPs
-	rand.Seed(1) // Deterministic
+	rng := rand.New(rand.NewSource(1)) // Deterministic
 	for i := range unsortedIIPs {
-		j := rand.Intn(i + 1)
+		j := rng.Intn(i + 1)
 		unsortedIIPs[i], unsortedIIPs[j] = unsortedIIPs[j], unsortedIIPs[i]
 	}
 

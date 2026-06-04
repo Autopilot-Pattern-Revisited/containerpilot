@@ -9,16 +9,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flynn/json5"
+	"github.com/titanous/json5"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
-	"github.com/tritondatacenter/containerpilot/config/logger"
-	"github.com/tritondatacenter/containerpilot/config/template"
-	"github.com/tritondatacenter/containerpilot/control"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/telemetry"
-	"github.com/tritondatacenter/containerpilot/watches"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/logger"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/template"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/control"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/telemetry"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/watches"
+	"github.com/goccy/go-yaml"
 )
 
 type rawConfig struct {
@@ -45,6 +46,13 @@ type Config struct {
 const (
 	// Amount of time to wait before killing the application
 	defaultStopTimeout int = 5
+)
+
+type ConfigFormat int
+
+const (
+	ConfigFormatJSON5 ConfigFormat = iota
+	ConfigFormatYAML
 )
 
 // InitLogging configure logrus with the new log config if available
@@ -97,7 +105,16 @@ func LoadConfig(configFlag string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config, err := newConfig(renderedConfig)
+
+	var format ConfigFormat
+	if strings.HasSuffix(configFlag, ".yaml") || strings.HasSuffix(configFlag, ".yml") {
+		format = ConfigFormatYAML
+	} else if strings.HasSuffix(configFlag, ".json5") || strings.HasSuffix(configFlag, ".json") {
+		format = ConfigFormatJSON5
+	} else {
+		return nil, fmt.Errorf("unable to determine config format from file extension: %s", configFlag)
+	}
+	config, err := newConfig(renderedConfig, format)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +142,20 @@ func renderConfigTemplate(configData []byte) ([]byte, error) {
 
 // newConfig unmarshals the textual configuration data into the
 // validated Config struct that we'll use the run the application
-func newConfig(configData []byte) (*Config, error) {
-	configMap, err := unmarshalConfig(configData)
+func newConfig(configData []byte, format ConfigFormat) (*Config, error) {
+	var (
+		configMap map[string]interface{}
+		err       error
+	)
+
+	if format == ConfigFormatYAML {
+		configMap, err = unmarshalConfigYAML(configData)
+	} else if format == ConfigFormatJSON5 {
+		configMap, err = unmarshalConfigJSON5(configData)
+	} else {
+		return nil, fmt.Errorf("unsupported config format: %v", format)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +210,7 @@ func newConfig(configData []byte) (*Config, error) {
 	return cfg, nil
 }
 
-func unmarshalConfig(data []byte) (map[string]interface{}, error) {
+func unmarshalConfigJSON5(data []byte) (map[string]interface{}, error) {
 	var config map[string]interface{}
 	if err := json5.Unmarshal(data, &config); err != nil {
 		syntax, ok := err.(*json5.SyntaxError)
@@ -192,6 +221,16 @@ func unmarshalConfig(data []byte) (map[string]interface{}, error) {
 		}
 		return nil, newJSONparseError(data, syntax)
 	}
+	return config, nil
+}
+
+func unmarshalConfigYAML(data []byte) (map[string]interface{}, error) {
+	var config map[string]interface{}
+
+	if err := yaml.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("could not parse configuration: %s", err)
+	}
+
 	return config, nil
 }
 
