@@ -12,7 +12,7 @@ import (
 
 const eventBufferSize = 1000
 
-// go:generate stringer -type MetricType
+//go:generate stringer -type MetricType
 
 // MetricType is an enum for Prometheus metric types
 type MetricType int

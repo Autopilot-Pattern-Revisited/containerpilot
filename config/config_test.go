@@ -141,7 +141,7 @@ func TestCustomConfigControl(t *testing.T) {
 	"control": {"socket": "/var/run/cp3-test.sock"},
 	"consul": "consul:8500"}`
 
-	cfg, err := newConfig([]byte(testJSONWithSocket))
+	cfg, err := newConfig([]byte(testJSONWithSocket), ConfigFormatJSON5)
 	if err != nil {
 		t.Fatalf("unexpected error in LoadConfig: %v", err)
 	}
@@ -199,7 +199,7 @@ func TestRenderedConfigIsParseable(t *testing.T) {
 
 	os.Setenv("TESTRENDERCONFIGISPARSEABLE", "-ok")
 	template, _ := renderConfigTemplate([]byte(testJSON))
-	config, err := newConfig(template)
+	config, err := newConfig(template, ConfigFormatJSON5)
 	if err != nil {
 		t.Fatalf("unexpected error in LoadConfig: %v", err)
 	}

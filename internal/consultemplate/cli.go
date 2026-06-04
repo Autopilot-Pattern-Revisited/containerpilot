@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/daemon"
@@ -40,8 +39,6 @@ const (
 
 // CLI is the main entry point.
 type CLI struct {
-	sync.Mutex
-
 	// outSteam and errStream are the standard out and standard error streams to
 	// write messages from the CLI.
 	outStream, errStream io.Writer
@@ -50,8 +47,7 @@ type CLI struct {
 	signalCh chan os.Signal
 
 	// stopCh is an internal channel used to trigger a shutdown of the CLI.
-	stopCh  chan struct{}
-	stopped bool
+	stopCh chan struct{}
 }
 
 // NewCLI creates a new CLI object with the given stdout and stderr streams.
@@ -207,19 +203,6 @@ func (cli *CLI) Run(args []string) int {
 			return ExitCodeOK
 		}
 	}
-}
-
-// stop is used internally to shutdown a running CLI
-func (cli *CLI) stop() {
-	cli.Lock()
-	defer cli.Unlock()
-
-	if cli.stopped {
-		return
-	}
-
-	close(cli.stopCh)
-	cli.stopped = true
 }
 
 // ParseFlags is a helper function for parsing command line flags using Go's

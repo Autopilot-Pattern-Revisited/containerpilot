@@ -17,9 +17,7 @@ import (
 	"github.com/Autopilot-Pattern-Revisited/containerpilot/tests"
 )
 
-func init() {
-	rand.Seed(time.Now().UTC().UnixNano())
-}
+var testRand = rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 
 func socketDialer(tempSocketPath string) func(string, string) (net.Conn, error) {
 	return func(_, _ string) (net.Conn, error) {
@@ -28,7 +26,7 @@ func socketDialer(tempSocketPath string) func(string, string) (net.Conn, error) 
 }
 
 func tempSocketPath() string {
-	filename := fmt.Sprintf("containerpilot-test-socket-%d", rand.Int())
+	filename := fmt.Sprintf("containerpilot-test-socket-%d", testRand.Int())
 	return filepath.Join(os.TempDir(), filename)
 }
 

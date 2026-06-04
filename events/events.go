@@ -12,7 +12,7 @@ type Event struct {
 	Source string
 }
 
-// go:generate stringer -type EventCode
+//go:generate stringer -type EventCode
 
 // EventCode is an enum for Events
 type EventCode int
