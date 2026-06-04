@@ -1,3 +1,3 @@
-FROM consul:1.11.4
+FROM consul:latest
 RUN apk --no-cache add jq curl
 COPY assert /bin/assert

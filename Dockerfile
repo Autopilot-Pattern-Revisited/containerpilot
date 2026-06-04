@@ -1,20 +1,11 @@
-FROM golang:1.19
+FROM golang:1.26.4-trixie AS builder
 
-ENV CONSUL_VERSION=1.13.3
+WORKDIR /build
+ENV CGO_ENABLED=0
 
-RUN  apt-get update \
-     && apt-get install -y unzip \
-     && go install honnef.co/go/tools/cmd/staticcheck@latest
+RUN --mount=type=bind,source=.,target=/source cd /source && GIT_HASH="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)" && VERSION="$(git describe --tags --always --dirty 2>/dev/null || echo dev-build-not-for-release)" && go build -o /build/containerpilot -ldflags "-X github.com/Autopilot-Pattern-Revisited/containerpilot/version.GitHash=${GIT_HASH} -X github.com/Autopilot-Pattern-Revisited/containerpilot/version.Version=${VERSION}"
 
+FROM scratch AS target
 
-RUN export CONSUL_CHECKSUM=5370b0b5bf765530e28cb80f90dcb47bd7d6ba78176c1ab2430f56e460ed279c \
-    && export archive=consul_${CONSUL_VERSION}_linux_amd64.zip \
-    && curl -Lso /tmp/${archive} https://releases.hashicorp.com/consul/${CONSUL_VERSION}/${archive} \
-    && echo "${CONSUL_CHECKSUM}  /tmp/${archive}" | sha256sum -c \
-    && cd /bin \
-    && unzip /tmp/${archive} \
-    && chmod +x /bin/consul \
-    && rm /tmp/${archive}
-
-ENV CGO_ENABLED 0
-ENV GOPATH /go
+COPY --from=builder /build/containerpilot /containerpilot
+ENTRYPOINT ["/containerpilot"]
