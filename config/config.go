@@ -9,16 +9,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flynn/json5"
+	"github.com/titanous/json5"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
-	"github.com/tritondatacenter/containerpilot/config/logger"
-	"github.com/tritondatacenter/containerpilot/config/template"
-	"github.com/tritondatacenter/containerpilot/control"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/telemetry"
-	"github.com/tritondatacenter/containerpilot/watches"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/logger"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/template"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/control"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/telemetry"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/watches"
 )
 
 type rawConfig struct {

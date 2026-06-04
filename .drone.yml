@@ -36,8 +36,8 @@ steps:
         go build \
           -o build/containerpilot \
           -ldflags \
-            "-X github.com/greenbaum/containerpilot/version.GitHash=$(git rev-parse --short HEAD) \
-             -X github.com/greenbaum/containerpilot/version.Version=${DRONE_TAG}"
+            "-X github.com/Autopilot-Pattern-Revisited/containerpilot/version.GitHash=$(git rev-parse --short HEAD) \
+             -X github.com/Autopilot-Pattern-Revisited/containerpilot/version.Version=${DRONE_TAG}"
       - mkdir release && cd build && tar -czf ../release/containerpilot-${DRONE_TAG}.tar.gz containerpilot
       - cd ../release && sha1sum containerpilot-${DRONE_TAG}.tar.gz > containerpilot-${DRONE_TAG}.sha1.txt
     when:
@@ -53,7 +53,7 @@ steps:
         - release/containerpilot-${DRONE_TAG}.tar.gz
         - release/containerpilot-${DRONE_TAG}.sha1.txt
       title: "New release: version ${DRONE_TAG}"
-      base_url: greenbaum/containerpilot
+      base_url: Autopilot-Pattern-Revisited/containerpilot
     when:
       event:
         - tag

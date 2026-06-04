@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tritondatacenter/containerpilot/subcommands"
-	"github.com/tritondatacenter/containerpilot/version"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/subcommands"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/version"
 )
 
 // MultiFlag provides a custom CLI flag that stores its unique values into a

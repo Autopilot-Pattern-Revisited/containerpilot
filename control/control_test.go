@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/tritondatacenter/containerpilot/events"
-	"github.com/tritondatacenter/containerpilot/tests"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/tests"
 )
 
 func init() {

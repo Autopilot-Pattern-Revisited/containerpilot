@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
 )
 
 // ParseArgs parses the executable and its arguments from supported

@@ -59,22 +59,68 @@ func (s *TestServer) Stop() error {
 	return s.cmd.Wait()
 }
 
-// failer implements the retry.Failer interface
+// failer implements the retry.TestingTB interface
 type failer struct {
-	failed bool
+	failed   bool
+	cleanups []func()
 }
 
+func (f *failer) Cleanup(clean func())      { f.cleanups = append(f.cleanups, clean) }
+func (f *failer) Error(args ...interface{}) { f.Log(args...); f.Fail() }
+func (f *failer) Errorf(format string, args ...interface{}) {
+	f.Logf(format, args...)
+	f.Fail()
+}
+func (f *failer) Fail()        { f.failed = true }
+func (f *failer) Failed() bool { return f.failed }
+func (f *failer) FailNow()     { f.Fail() }
+func (f *failer) Fatal(args ...interface{}) {
+	f.Log(args...)
+	f.FailNow()
+}
+func (f *failer) Fatalf(format string, args ...interface{}) {
+	f.Logf(format, args...)
+	f.FailNow()
+}
 func (f *failer) Helper()                 {}
 func (f *failer) Log(args ...interface{}) { fmt.Println(args...) }
-func (f *failer) FailNow()                { f.failed = true }
+func (f *failer) Logf(format string, args ...interface{}) {
+	fmt.Printf(format+"\n", args...)
+}
+func (f *failer) Name() string { return "consul-test-server" }
+func (f *failer) Setenv(key, value string) {
+	prevValue, ok := os.LookupEnv(key)
+	os.Setenv(key, value)
+	f.Cleanup(func() {
+		if ok {
+			os.Setenv(key, prevValue)
+		} else {
+			os.Unsetenv(key)
+		}
+	})
+}
+func (f *failer) TempDir() string {
+	dir, err := os.MkdirTemp("", "containerpilot-consul-test-*")
+	if err != nil {
+		f.Fatalf("failed to create temporary directory: %v", err)
+	}
+	f.Cleanup(func() { os.RemoveAll(dir) })
+	return dir
+}
 
 // WaitForAPI waits for only the agent HTTP endpoint to start responding. This
 // is an indication that the agent has started, but will likely return before a
 // leader is elected.
 func (s *TestServer) WaitForAPI() error {
 	f := &failer{}
+	defer func() {
+		for i := len(f.cleanups) - 1; i >= 0; i-- {
+			f.cleanups[i]()
+		}
+	}()
+
 	retry.Run(f, func(r *retry.R) {
-		resp, err := s.client.Get(s.HTTPAddr + "/v1/agent/self")
+		resp, err := s.client.Get("http://" + s.HTTPAddr + "/v1/agent/self")
 		if err != nil {
 			r.Fatal(err)
 		}

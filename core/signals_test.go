@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tritondatacenter/containerpilot/events"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/tests/mocks"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/tests/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

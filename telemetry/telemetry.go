@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/tritondatacenter/containerpilot/version"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/version"
 )
 
 // Telemetry represents the service to advertise for finding the metrics

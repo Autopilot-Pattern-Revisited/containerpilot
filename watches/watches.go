@@ -6,8 +6,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/events"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/events"
 )
 
 // Watch represents an event to signal when something changes

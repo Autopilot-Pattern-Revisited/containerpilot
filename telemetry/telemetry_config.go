@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/tritondatacenter/containerpilot/config/decode"
-	"github.com/tritondatacenter/containerpilot/config/services"
-	"github.com/tritondatacenter/containerpilot/discovery"
-	"github.com/tritondatacenter/containerpilot/jobs"
-	"github.com/tritondatacenter/containerpilot/version"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/services"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/discovery"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/jobs"
+	"github.com/Autopilot-Pattern-Revisited/containerpilot/version"
 )
 
 // Config represents the service to advertise for finding the metrics
