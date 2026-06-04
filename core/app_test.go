@@ -151,7 +151,7 @@ func TestReloadConfig(t *testing.T) {
 // write the configuration to a tempfile. caller is responsible
 // for calling 'defer os.Remove(f.Name())' when done
 func testCfgToTempFile(t *testing.T, text string) *os.File {
-	f, err := os.CreateTemp(".", "test-")
+	f, err := os.CreateTemp(".", "test-*.json5")
 	if err != nil {
 		t.Fatal(err)
 	}

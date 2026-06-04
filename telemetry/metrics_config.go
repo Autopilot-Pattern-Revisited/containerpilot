@@ -6,6 +6,7 @@ import (
 
 	"github.com/Autopilot-Pattern-Revisited/containerpilot/config/decode"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
 )
 
 // A MetricConfig is a single measurement of the application.
@@ -39,6 +40,9 @@ func NewMetricConfigs(raw []interface{}) ([]*MetricConfig, error) {
 func (cfg *MetricConfig) Validate() error {
 
 	cfg.fullName = strings.Join([]string{cfg.Namespace, cfg.Subsystem, cfg.Name}, "_")
+	if !model.LegacyValidation.IsValidMetricName(cfg.fullName) {
+		return fmt.Errorf("invalid metric name: %s", cfg.fullName)
+	}
 
 	// the prometheus client lib's API here is baffling... they don't expose
 	// an interface or embed their Opts type in each of the Opts "subtypes",

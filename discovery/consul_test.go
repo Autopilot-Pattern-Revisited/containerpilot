@@ -73,7 +73,7 @@ func TestCheckForChanges(t *testing.T) {
 func TestWithConsul(t *testing.T) {
 	testServer, err := NewTestServer(8500)
 	if err != nil {
-		t.Fatal(err)
+		t.Skip(err)
 	}
 	defer testServer.Stop()
 
