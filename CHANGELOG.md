@@ -1,3 +1,62 @@
+## 4.0.0 (June 5th, 2026)
+
+This release modernizes the revived ContainerPilot fork after the original
+upstream history, while preserving the core runtime behavior.
+
+BREAKING CHANGES:
+
+- Removed the legacy `makefile` build path in favor of direct Go, Docker, and
+  GitHub Actions workflows.
+- Removed the legacy Drone, Travis CI, direnv, and Nix shell configuration.
+- Release artifacts are now produced from `v*` tags by GitHub Actions rather
+  than the original release tooling.
+
+FEATURES:
+
+- Added Go module based builds with updated dependencies and static
+  `CGO_ENABLED=0` binaries.
+- Added YAML configuration support alongside the existing JSON5 configuration
+  path, including a YAML fixture test.
+- Bundled `consul-template` 0.42.0 into the ContainerPilot binary. Running the
+  executable as `consul-template` dispatches to the embedded consul-template
+  CLI.
+- Added a modern multi-stage Dockerfile that builds ContainerPilot directly and
+  embeds `version.GitHash` and `version.Version` from Git metadata. Docker
+  builds now use `git describe --tags --always --dirty` with a sensible
+  development fallback instead of hard-coded `v0.0.0`.
+- Added GitHub Actions CI for linting, unit tests, and integration tests.
+- Added GitHub Actions releases for multi-platform GHCR Docker images
+  (`linux/amd64`, `linux/arm64`) and static binary archives for `linux/amd64`,
+  `linux/arm64`, `darwin/amd64`, and `darwin/arm64`, with SHA256 checksums.
+
+BUG FIXES:
+
+- Fixed discovery test server compatibility with the current retry testing
+  interface and ensured it returns a complete HTTP URL.
+- Fixed config tests after the configuration format changes.
+- Fixed staticcheck findings, including stale compiler directives, deprecated
+  random seeding in tests, dynamic printf formatting, and unused
+  consul-template wrapper fields.
+- Fixed unit test failures under `CGO_ENABLED=0 go test -v ./... -bench .`.
+- Fixed JSON5 test coverage by adding a YAML variant.
+- Fixed telemetry tests for the current validation behavior.
+
+INFRASTRUCTURE:
+
+- CI now installs the latest Consul release available from HashiCorp releases
+  for unit tests and verifies the download with SHA256.
+- Integration tests now run only on pushes to `master`.
+- Updated integration tests and fixtures for Docker Compose v2 while keeping a
+  `docker-compose` compatibility wrapper for existing test scripts.
+- Updated integration fixtures to use current base images, including
+  `hashicorp/consul:latest` and `node:22-bookworm-slim`.
+- Updated the nginx integration fixture to use the bundled ContainerPilot binary
+  as both `/bin/containerpilot` and `/bin/consul-template`, removing the old
+  external consul-template download.
+- Added integration debug log upload in CI.
+- Refreshed repository documentation and import paths for the
+  `Autopilot-Pattern-Revisited/containerpilot` fork.
+
 ## 3.6.2 (Unreleased)
 
 ## 3.6.1 (December 7th, 2017)
