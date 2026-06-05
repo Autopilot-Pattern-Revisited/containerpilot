@@ -5,16 +5,11 @@ FROM alpine:3.15
 RUN apk update && apk add \
     nginx \
     curl \
-    unzip \
     && rm -rf /var/cache/apk/*
-
-# we use consul-template to re-write our Nginx virtualhost config
-RUN curl -Lo /tmp/consul_template_0.28.1_linux_amd64.zip https://releases.hashicorp.com/consul-template/0.28.1/consul-template_0.28.1_linux_amd64.zip && \
-    unzip /tmp/consul_template_0.28.1_linux_amd64.zip && \
-    mv consul-template /bin
 
 # add ContainerPilot build and configuration
 COPY build/containerpilot /bin/containerpilot
+COPY build/containerpilot /bin/consul-template
 COPY etc /etc
 
 EXPOSE 80

@@ -5,10 +5,13 @@ logFail() {
     exit 1
 }
 
-docker-compose run -d app
-id=$(docker-compose ps -q app)
-docker logs "$id" | grep -qv panic
+id=$(docker-compose run -d app)
+logs=$(docker logs "$id")
+echo "$logs" | grep -q panic
 result=$?
 docker stop "$id" || logFail 'should still be running'
 
-exit $result
+if [ "$result" -eq 0 ]; then
+    logFail 'should not panic'
+fi
+exit 0

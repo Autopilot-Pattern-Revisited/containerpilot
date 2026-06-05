@@ -2,6 +2,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
 DEBUG_LOG=${DEBUG_LOG:-"/dev/null"}
+COMPOSE=${COMPOSE:-docker-compose}
 ROOT_DIR="$DIR/integration_tests"
 FIXTURE_DIR="$ROOT_DIR/fixtures"
 TESTS_DIR="$ROOT_DIR/tests"
@@ -46,24 +47,41 @@ debug "TESTS_DIR=$TESTS_DIR"
 
 ## Main Code
 
+setup_compose_compat() {
+  if [ "$COMPOSE" = "docker-compose" ] && command -v docker-compose >/dev/null 2>&1; then
+    return
+  fi
+
+  COMPOSE_WRAPPER_DIR="$(mktemp -d)"
+  cat > "${COMPOSE_WRAPPER_DIR}/docker-compose" <<'EOF'
+#!/usr/bin/env bash
+if [ -n "${COMPOSE:-}" ]; then
+  read -r -a cmd <<< "$COMPOSE"
+else
+  cmd=(docker compose)
+fi
+exec "${cmd[@]}" "$@"
+EOF
+  chmod +x "${COMPOSE_WRAPPER_DIR}/docker-compose"
+  export PATH="${COMPOSE_WRAPPER_DIR}:$PATH"
+}
+
 create_test_fixtures() {
   banner "Create Test Fixtures"
   if [ ! -f "$DIR/build/containerpilot" ]; then die "ContainerPilot not built. Did you make?"; fi
-  find $FIXTURE_DIR -maxdepth 1 -mindepth 1 -type d | \
-    sort | \
-    while read FDIR; do
+  while read FDIR; do
       FNAME="${FIXTURE_PREFIX}$(basename $FDIR)"
       rm -rf $FDIR/build
       cp -r $DIR/build $FDIR/build
       cd $FDIR
       if [ -z "$(docker images -q $FNAME)" ]; then
         log "Create fixture $FNAME"
-        docker build -t $FNAME --no-cache=false . 2>&1 >> ${DEBUG_LOG}
+        docker build -t $FNAME --no-cache=false . 2>&1 >> ${DEBUG_LOG} || die "failed to build fixture $FNAME"
         rm -rf $FDIR/build
       else
         log "Skipping Fixture $FNAME ... already exists"
       fi
-  done
+  done < <(find $FIXTURE_DIR -maxdepth 1 -mindepth 1 -type d | sort)
 }
 
 destroy_test_fixtures() {
@@ -85,14 +103,14 @@ destroy_test_fixtures() {
 
 build_test_compose() {
   if [ -r "$COMPOSE_FILE" ]; then
-    docker-compose build >> ${DEBUG_LOG} 2>&1
+    $COMPOSE build >> ${DEBUG_LOG} 2>&1
   fi
 }
 
 destroy_test_compose() {
   if [ -r "$COMPOSE_FILE" ]; then
-    docker-compose kill >> ${DEBUG_LOG} 2>&1
-    docker-compose rm -f >> ${DEBUG_LOG} 2>&1
+    $COMPOSE kill >> ${DEBUG_LOG} 2>&1
+    $COMPOSE rm -f >> ${DEBUG_LOG} 2>&1
   fi
 }
 
@@ -147,12 +165,13 @@ clean_tests() {
 
 COMMAND=${1:-"test"}
 shift
+setup_compose_compat
 case $COMMAND in
   create_test_fixtures)
-    create_test_fixtures
+    create_test_fixtures || exit 1
   ;;
   test)
-    create_test_fixtures
+    create_test_fixtures || exit 1
     run_tests "$1"
     result=$?
     if [ $result -ne 0 ]; then

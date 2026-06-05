@@ -1,4 +1,5 @@
-app:
+services:
+  app:
     image: "cpfix_consul"
     mem_limit: 128m
     volumes:

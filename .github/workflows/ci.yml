@@ -94,22 +94,25 @@ jobs:
           cache: true
 
       - name: Build
-        run: CGO_ENABLED=0 go build -o build/containerpilot
-
-      - name: Add docker-compose compatibility command
         run: |
-          sudo tee /usr/local/bin/docker-compose >/dev/null <<'EOF'
-          #!/usr/bin/env bash
-          docker compose "$@"
-          EOF
-          sudo chmod +x /usr/local/bin/docker-compose
+          git_hash="$(git rev-parse --short HEAD)"
+          ldflags="-X github.com/Autopilot-Pattern-Revisited/containerpilot/version.GitHash=${git_hash} -X github.com/Autopilot-Pattern-Revisited/containerpilot/version.Version=dev-build-not-for-release"
+          CGO_ENABLED=0 go build -o build/containerpilot -ldflags "${ldflags}"
 
       - name: Clean integration fixtures
-        run: scripts/test.sh clean
+        run: COMPOSE="docker compose" scripts/test.sh clean
 
       - name: Run integration tests
-        run: scripts/test.sh test all
+        run: DEBUG_LOG=integration_tests/debug.log COMPOSE="docker compose" scripts/test.sh test all
 
       - name: Clean integration fixtures after run
         if: always()
-        run: scripts/test.sh clean
+        run: COMPOSE="docker compose" scripts/test.sh clean
+
+      - name: Upload integration debug log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-debug-log
+          path: integration_tests/debug.log
+          if-no-files-found: ignore
