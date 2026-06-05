@@ -4,6 +4,18 @@
 
 [![MPL licensed](https://img.shields.io/badge/license-MPL_2.0-blue.svg)](https://github.com/Autopilot-Pattern-Revisited/containerpilot/blob/master/LICENSE)
 
+## Current modernization status
+
+This fork is being modernized for current Go, Docker, and GitHub release workflows while keeping the original ContainerPilot behavior intact.
+
+- Builds are Go module based and produce static binaries with `CGO_ENABLED=0`.
+- The Dockerfile builds ContainerPilot directly and sets `version.Version` from `git describe --tags --always --dirty`, falling back to `dev-build-not-for-release` when Git metadata is unavailable.
+- `consul-template` is bundled into the ContainerPilot binary. If the executable is invoked with the basename `consul-template`, ContainerPilot dispatches to the embedded consul-template CLI.
+- CI runs on GitHub Actions. Lint uses `staticcheck` and `go vet`; unit tests run `CGO_ENABLED=0 go test -v ./... -bench .`.
+- Unit-test CI installs the latest Consul release available from HashiCorp releases and verifies the downloaded archive with SHA256.
+- Integration tests run on pushes to `master` using Docker Compose v2. The test harness still provides a `docker-compose` compatibility command for existing integration test scripts.
+- Releases are published only from `v*` tags. The release workflow pushes a multi-platform Docker image to GHCR for `linux/amd64` and `linux/arm64`, and attaches static binary archives plus SHA256 checksums for `linux/amd64`, `linux/arm64`, `darwin/amd64`, and `darwin/arm64`.
+
 ## What is ContainerPilot?
 
 Orchestration is the automation of the operations of an application. Most application require operational tasks like connecting them to related components ([WordPress needs to know where it's MySQL and Memcached servers are, for example](https://www.tritondatacenter.com/blog/wordpress-on-autopilot)), and some applications require special attention as they start up or shut down to be sure they bootstrap correctly or persist their data. We can do all that by hand, but modern applications automate those tasks in code. That's called "orchestration."
@@ -27,13 +39,55 @@ Check out our ["Hello, World" application](https://github.com/autopilotpattern/h
 ```
 git clone git@github.com:autopilotpattern/hello-world.git
 cd hello-world
-docker-compose up -d
+docker compose up -d
 open http://localhost
 ```
 
-This application blueprint demonstrates using ContainerPilot to update Nginx upstream configuration at runtime. Try scaling up via `docker-compose scale hello=2 world=3` to see the Nginx configuration updated.
+This application blueprint demonstrates using ContainerPilot to update Nginx upstream configuration at runtime. Try scaling up via `docker compose up -d --scale hello=2 --scale world=3` to see the Nginx configuration updated.
 
 You can also [download](https://github.com/Autopilot-Pattern-Revisited/containerpilot/releases) the latest release of ContainerPilot from GitHub.
+
+## Build and test
+
+Build a local binary:
+
+```
+CGO_ENABLED=0 go build -o build/containerpilot
+```
+
+Build the release-style Docker image locally:
+
+```
+docker build -t containerpilot .
+```
+
+The Docker build embeds version metadata from Git when available. For a tagged checkout, `containerpilot -version` reports the tag-derived version; for an untagged working tree it reports the nearest sensible `git describe` value.
+
+Run the same main checks used by CI:
+
+```
+$(go env GOPATH)/bin/staticcheck ./...
+go vet ./...
+CGO_ENABLED=0 go test -v ./... -bench .
+```
+
+Run integration tests with Docker Compose v2:
+
+```
+CGO_ENABLED=0 go build -o build/containerpilot
+COMPOSE="docker compose" scripts/test.sh test all
+```
+
+## Embedded consul-template
+
+ContainerPilot includes consul-template in the same binary. Install or copy the binary under the name `consul-template` to use that mode:
+
+```
+cp containerpilot consul-template
+./consul-template -version
+```
+
+This is useful for images that already carry ContainerPilot and want consul-template behavior without downloading a second binary.
 
 ## Documentation
 
